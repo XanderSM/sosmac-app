@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso - SOSMAC</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Fondo Animado */
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(-45deg, #0b1536, #11235A, #1E5DDB, #5bc0de);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Tarjeta Principal con efecto 3D Hover */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+            width: 900px;
+            max-width: 95%;
+            display: flex;
+            flex-wrap: wrap;
+            transform: perspective(1000px) rotateX(0deg) rotateY(0deg);
+            transition: transform 0.5s ease, box-shadow 0.5s ease;
+        }
+
+        .glass-card:hover {
+            transform: perspective(1000px) rotateX(1deg) rotateY(1deg) translateY(-5px);
+            box-shadow: 0 35px 60px rgba(0, 0, 0, 0.6);
+        }
+
+        /* Panel Izquierdo (Branding) */
+        .left-panel {
+            background: #11235A;
+            color: white;
+            padding: 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            flex: 1;
+            min-width: 300px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Orbes flotantes */
+        .left-panel::before, .left-panel::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #1E5DDB, #5bc0de);
+            opacity: 0.4;
+            filter: blur(25px);
+            animation: floatOrb 8s ease-in-out infinite;
+        }
+
+        .left-panel::before {
+            width: 200px; height: 200px; top: -50px; left: -50px;
+        }
+
+        .left-panel::after {
+            width: 150px; height: 150px; bottom: -20px; right: -30px;
+            animation-delay: -4s;
+        }
+
+        @keyframes floatOrb {
+            0% { transform: translateY(0px) scale(1); }
+            50% { transform: translateY(-30px) scale(1.1); }
+            100% { transform: translateY(0px) scale(1); }
+        }
+
+        /* Logo Levitando (SIN FONDO BLANCO) */
+        .logo-container img {
+            width: 180px;
+            background: transparent;
+            padding: 0;
+            filter: drop-shadow(0 15px 25px rgba(0,0,0,0.5));
+            margin-bottom: 25px;
+            z-index: 2;
+            position: relative;
+            animation: floatLogo 4s ease-in-out infinite;
+        }
+
+        @keyframes floatLogo {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* Panel Derecho (Formulario) */
+        .right-panel {
+            padding: 50px 60px;
+            flex: 1;
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: white;
+        }
+
+        /* Inputs Neumórficos */
+        .form-control {
+            background: #f4f7f6;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            padding: 14px 18px;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 3px 6px rgba(0,0,0,0.03);
+            font-weight: 500;
+        }
+
+        .form-control:focus {
+            background: #fff;
+            border-color: #1E5DDB;
+            box-shadow: 0 0 0 4px rgba(30, 93, 219, 0.1), inset 0 2px 5px rgba(0,0,0,0.02);
+        }
+
+        /* Botón 3D */
+        .btn-login {
+            background: linear-gradient(45deg, #11235A, #1E5DDB);
+            color: white;
+            font-weight: 800;
+            letter-spacing: 1px;
+            border-radius: 12px;
+            padding: 14px;
+            border: none;
+            box-shadow: 0 10px 20px rgba(30, 93, 219, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px rgba(30, 93, 219, 0.4);
+            color: white;
+        }
+
+        .btn-login:active {
+            transform: translateY(1px);
+            box-shadow: 0 5px 10px rgba(30, 93, 219, 0.3);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="glass-card">
+        <div class="left-panel">
+            <div class="logo-container">
+                <img src="{{ asset('img/logo.png') }}" alt="SOSMAC">
+            </div>
+            <h3 class="fw-bold mb-2" style="z-index: 2; position: relative;">Acceso SOSMAC</h3>
+            <p style="z-index: 2; position: relative; color: #a8b2d1;">Gestión Ambiental Inteligente</p>
+        </div>
+
+        <div class="right-panel">
+            <h4 class="fw-bold text-dark mb-4">Ingreso al Sistema</h4>
+            
+            @if($errors->any())
+                <div class="alert alert-danger p-2 small">
+                    {{ $errors->first() }}
+                </div>
+            @endif
+            
+            <form action="{{ route('login.post') }}" method="POST">
+                @csrf
+                <div class="mb-4">
+                    <label class="form-label fw-bold text-muted small" style="letter-spacing: 0.5px;">CORREO ELECTRÓNICO</label>
+                    <input type="email" class="form-control" name="email" placeholder="Ej: admin@sosmac.com" required autofocus>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label fw-bold text-muted small" style="letter-spacing: 0.5px;">CONTRASEÑA</label>
+                    <input type="password" class="form-control" name="password" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn btn-login w-100 mt-2">INGRESAR AL SISTEMA</button>
+            </form>
+            
+            <div class="mt-4 small text-muted text-center border-top pt-3">
+                <p class="mb-0"><strong>Credenciales de prueba:</strong><br>
+                Admin: admin@sosmac.com / admin123<br>
+                Técnico: tecnico@sosmac.com / tecnico123</p>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
