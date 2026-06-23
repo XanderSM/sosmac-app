@@ -9,9 +9,9 @@
     .stat-value { font-size: 1.8rem; font-weight: 900; color: #11235A; margin: 0;}
     .icon-box { width: 55px; height: 55px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
     
-    .bg-green-light { background-color: #e6f8f3; color: #10b981; }
+    .bg-green-light { background-color: #e6f8f3; color: #020e39; }
     .bg-blue-light { background-color: #e8f0fe; color: #1E5DDB; }
-    .bg-orange-light { background-color: #fff3e0; color: #f59e0b; }
+    .bg-orange-light { background-color: #fff3e0; color: #031447; }
     .bg-purple-light { background-color: #f3e8ff; color: #8b5cf6; }
     
     /* Paneles de Gráficos y Reportes */

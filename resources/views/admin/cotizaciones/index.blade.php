@@ -29,8 +29,13 @@
 @endpush
 
 @section('content')
+
+    <!-- Alertas del Sistema -->
     @if(session('success'))
         <div class="alert alert-success border-0 shadow-sm"><i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}</div>
+    @endif
+    @if($errors->any())
+        <div class="alert alert-danger border-0 shadow-sm"><i class="bi bi-exclamation-triangle-fill me-2"></i>{{ $errors->first() }}</div>
     @endif
 
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -43,6 +48,7 @@
         </button>
     </div>
 
+    <!-- TABLA PRINCIPAL DE COTIZACIONES -->
     <div class="card p-4 border-0 shadow-sm" style="border-radius: 16px;">
         <table class="table table-hover mb-0">
             <thead class="bg-light">
@@ -69,14 +75,34 @@
                         @else <span class="badge bg-warning text-dark">Pendiente</span> @endif
                     </td>
                     <td class="text-center">
+                        <!-- Botón Descargar PDF -->
                         <a href="{{ route('cotizaciones.pdf', $coti->id) }}" class="btn btn-sm btn-outline-secondary me-1" title="Descargar PDF">
                             <i class="bi bi-file-earmark-pdf-fill"></i>
                         </a>
+                        
                         @if($coti->estado == 'Pendiente')
+                        <!-- Botón Aprobar -->
                         <form action="{{ route('cotizaciones.estado', $coti->id) }}" method="POST" class="d-inline">
                             @csrf @method('PUT')
                             <input type="hidden" name="estado" value="Aprobada">
                             <button type="submit" class="btn btn-sm btn-outline-success me-1" title="Aprobar"><i class="bi bi-check-lg"></i></button>
+                        </form>
+                        
+                        <!-- Botón Rechazar -->
+                        <form action="{{ route('cotizaciones.estado', $coti->id) }}" method="POST" class="d-inline">
+                            @csrf @method('PUT')
+                            <input type="hidden" name="estado" value="Rechazada">
+                            <button type="submit" class="btn btn-sm btn-outline-warning me-1" title="Rechazar"><i class="bi bi-x-lg"></i></button>
+                        </form>
+                        @endif
+
+                        <!-- Botón Eliminar (Solo aparece si fue rechazada) -->
+                        @if($coti->estado == 'Rechazada')
+                        <form action="{{ route('cotizaciones.destroy', $coti->id) }}" method="POST" class="d-inline">
+                            @csrf @method('DELETE')
+                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar" onclick="return confirm('¿Seguro que deseas eliminar esta cotización rechazada? Esta acción no se puede deshacer.')">
+                                <i class="bi bi-trash-fill"></i>
+                            </button>
                         </form>
                         @endif
                     </td>
@@ -134,11 +160,11 @@
                                     </div>
                                     <div class="mb-3">
                                         <label class="form-label text-muted small fw-bold">TÍTULO PROYECTO</label>
-                                        <input type="text" class="form-control fw-bold" name="titulo_proyecto" placeholder="Ej: CONSORCIO MET - 03 CAMPAMENTO">
+                                        <input type="text" class="form-control fw-bold" name="titulo_proyecto" placeholder="Ej: CONSORCIO MET - 03 CAMPAMENTO" required>
                                     </div>
                                     <div class="mb-4">
                                         <label class="form-label text-muted small fw-bold">DIRECCIÓN</label>
-                                        <input type="text" class="form-control" name="direccion_proyecto">
+                                        <input type="text" class="form-control" name="direccion_proyecto" required>
                                     </div>
                                 </div>
 
@@ -188,7 +214,7 @@
                                     </div>
                                 </div>
 
-                                <!-- Textareas inferiores -->
+                                <!-- Textareas inferiores RESTAURADOS -->
                                 <div class="row g-3">
                                     <div class="col-md-6">
                                         <div class="card-panel h-100">
@@ -239,9 +265,9 @@
         tr.id = `fila-${contadorFilas}`;
         tr.innerHTML = `
             <td><select class="form-select form-select-sm fw-bold border-0 select-servicio" name="servicios[${contadorFilas}][id]" onchange="cargarPrecio(${contadorFilas})" required>${opciones}</select></td>
-            <td><input type="text" class="form-control form-control-sm text-center border-0" value="GLB"></td>
+            <td><input type="text" class="form-control form-control-sm text-center border-0" value="GLB" readonly></td>
             <td><input type="number" class="form-control form-control-sm text-center border-0 input-aplic" name="servicios[${contadorFilas}][aplic]" value="1" min="1" oninput="calcular()"></td>
-            <td><input type="number" class="form-control form-control-sm text-center border-0 input-serv" name="servicios[${contadorFilas}][cantidad]" value="1" min="1" oninput="calcular()"></td>
+            <td><input type="number" class="form-control form-control-sm text-center border-0 input-serv" name="servicios[${contadorFilas}][serv]" value="1" min="1" oninput="calcular()"></td>
             <td><input type="number" step="0.01" class="form-control form-control-sm text-end border-0 fw-bold text-primary input-precio" name="servicios[${contadorFilas}][precio]" value="0.00" min="0" oninput="calcular()"></td>
             <td class="text-end fw-bold align-middle col-importe" style="padding-right: 15px;">
                 <div class="d-flex justify-content-end align-items-center gap-3">

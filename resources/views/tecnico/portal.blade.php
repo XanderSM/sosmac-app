@@ -23,13 +23,13 @@
         .card-job { background: white; border-radius: 16px; padding: 30px; border: 1px solid #edf2f9; box-shadow: 0 4px 15px rgba(0,0,0,0.02); margin-bottom: 25px; }
         .tag-id { background-color: #e8f0fe; color: #1E5DDB; font-size: 0.75rem; font-weight: bold; padding: 5px 10px; border-radius: 6px; }
         .location-box { border: 1px solid #edf2f9; border-radius: 12px; padding: 15px; display: flex; justify-content: space-between; align-items: center; margin: 20px 0; }
-        .btn-ir { background-color: #3b82f6; color: white; font-weight: bold; border-radius: 8px; padding: 8px 25px; border: none; }
-        .btn-terminar { background-color: #059669; color: white; font-weight: bold; border-radius: 8px; padding: 12px; width: 100%; border: none; transition: 0.3s; }
-        .btn-terminar:hover { background-color: #047857; }
+        .btn-ir { background-color: #0d0343; color: white; font-weight: bold; border-radius: 8px; padding: 8px 25px; border: none; }
+        .btn-terminar { background-color: #030544; color: white; font-weight: bold; border-radius: 8px; padding: 12px; width: 100%; border: none; transition: 0.3s; }
+        .btn-terminar:hover { background-color: #0c0338; }
         
         /* Panel Desplegable */
         .panel-finalizar { display: none; margin-top: 20px; border-top: 1px dashed #ccc; padding-top: 20px; }
-        .textarea-green { border: 2px solid #10b981; border-radius: 8px; box-shadow: none !important; }
+        .textarea-green { border: 2px solid #16023a; border-radius: 8px; box-shadow: none !important; }
     </style>
 </head>
 <body>
@@ -109,7 +109,7 @@
                         
                         <div class="d-flex justify-content-between align-items-center">
                             <button type="button" class="btn fw-bold text-muted" onclick="ocultarPanel({{ $orden->id }})">CANCELAR</button>
-                            <button type="submit" class="btn" style="background-color: #059669; color: white; font-weight: bold; border-radius: 8px; padding: 10px 40px;">CONFIRMAR FINALIZACIÓN</button>
+                            <button type="submit" class="btn" style="background-color: #270458; color: white; font-weight: bold; border-radius: 8px; padding: 10px 40px;">CONFIRMAR FINALIZACIÓN</button>
                         </div>
                     </form>
                 </div>

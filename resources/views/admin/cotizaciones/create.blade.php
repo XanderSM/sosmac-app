@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SOSMAC - Nueva Cotización</title>
+    <title>ProFund Events - Nueva Cotización</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <style>
         body { background-color: #f4f7f6; font-family: 'Segoe UI', sans-serif; overflow-x: hidden; }
         .sidebar { background-color: #11235A; color: white; min-height: 100vh; width: 250px; position: fixed; display: flex; flex-direction: column; z-index: 1000; top: 0; left: 0; }
         .sidebar-brand { padding: 30px 20px; display: flex; align-items: center; gap: 15px; font-weight: 900; font-size: 1.2rem; }
-        .sidebar-brand .logo-icon { background: white; color: #11235A; padding: 10px; border-radius: 10px; font-size: 1.5rem; line-height: 1; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4)); }
+        .sidebar-brand .logo-icon { background: white; color: #11235A; padding: 10px; border-radius: 10px; font-size: 1.5rem; line-height: 1; }
         .nav-link { color: #a8b2d1; padding: 12px 20px; margin: 5px 15px; border-radius: 8px; display: flex; align-items: center; gap: 15px; transition: all 0.3s; text-decoration: none; font-weight: 600;}
         .nav-link:hover, .nav-link.active { background-color: #1E5DDB; color: white; }
         .nav-link i { font-size: 1.2rem; }
@@ -40,12 +40,13 @@
 </head>
 <body>
 
+    <!-- Menú Lateral -->
     <div class="sidebar">
         <div class="sidebar-brand">
-            <img src="{{ asset('img/logo.png') }}" alt="Logo SOSMAC" style="width: 55px; height: auto; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4));">
+            <div class="logo-icon"><i class="bi bi-shield-check"></i></div>
             <div>
-                <div style="line-height: 1.2; font-weight: 900; font-size: 1.2rem; letter-spacing: 1px;">SOSMAC</div>
-                <div style="font-size: 0.65rem; font-weight: 600; color: #a8b2d1;">SANEAMIENTO</div>
+                <div style="line-height: 1.2;">ProFund</div>
+                <div style="font-size: 0.7rem; font-weight: 500; color: #a8b2d1;">EVENTS SANEAMIENTO</div>
             </div>
         </div>
         <a href="/admin/dashboard" class="nav-link"><i class="bi bi-grid-fill"></i> Dashboard</a>
@@ -62,6 +63,7 @@
         </div>
     </div>
 
+    <!-- Contenido Principal -->
     <div class="main-content">
         <div class="d-flex justify-content-between align-items-end mb-4">
             <div>
@@ -77,6 +79,7 @@
         <form action="{{ route('cotizaciones.store') }}" method="POST">
             @csrf
             
+            <!-- TARJETA 1: CLIENTE -->
             <div class="card-premium">
                 <div class="card-header-premium">
                     <i class="bi bi-person-badge fs-5"></i> 1. Información del Cliente
@@ -96,11 +99,12 @@
                 </div>
             </div>
 
+            <!-- TARJETA 2: SERVICIOS -->
             <div class="card-premium">
                 <div class="card-header-premium d-flex justify-content-between align-items-center">
-                    <div><i class="bi bi-card-list fs-5"></i> 2. Servicios Operativos</div>
+                    <div><i class="bi bi-card-list fs-5"></i> 2. Detalle de Servicios (Líneas de Presupuesto)</div>
                     <button type="button" class="btn btn-add" onclick="agregarFila()">
-                        <i class="bi bi-plus-circle-fill me-1"></i> Agregar Fila
+                        <i class="bi bi-plus-circle-fill me-1"></i> Añadir otra línea
                     </button>
                 </div>
                 <div class="p-0">
@@ -108,29 +112,29 @@
                         <table class="table table-custom mb-0" id="tabla-detalles">
                             <thead>
                                 <tr>
-                                    <th style="width: 35%; padding-left: 25px;">Área a Tratar (Servicio)</th>
-                                    <th style="width: 10%;" class="text-center">UND</th>
-                                    <th style="width: 10%;" class="text-center">APLIC</th>
-                                    <th style="width: 10%;" class="text-center">SERV</th>
-                                    <th style="width: 15%;" class="text-end">PRECIO</th>
-                                    <th style="width: 15%;" class="text-end">IMPORTE</th>
-                                    <th style="width: 5%;" class="text-center"><i class="bi bi-trash"></i></th>
+                                    <th style="width: 40%; padding-left: 25px;">Descripción del Servicio</th>
+                                    <th style="width: 15%;" class="text-center">Cant.</th>
+                                    <th style="width: 20%;" class="text-end">Precio Unit. (S/)</th>
+                                    <th style="width: 20%;" class="text-end">Subtotal (S/)</th>
+                                    <th style="width: 5%;" class="text-center">Quitar</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                </tbody>
+                                <!-- Filas dinámicas -->
+                            </tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
+            <!-- TARJETA 3: RESUMEN Y TOTALES -->
             <div class="row justify-content-end mb-5">
                 <div class="col-lg-5 col-md-6">
                     <div class="totals-panel shadow-sm">
-                        <h6 class="fw-bold text-muted mb-4 text-uppercase letter-spacing-1"><i class="bi bi-calculator me-2"></i>Total de la Inversión</h6>
+                        <h6 class="fw-bold text-muted mb-4 text-uppercase letter-spacing-1"><i class="bi bi-calculator me-2"></i>Resumen Financiero</h6>
                         
                         <div class="total-row">
-                            <span class="fw-bold">Subtotal</span>
+                            <span class="fw-bold">Valor de Venta (Subtotal)</span>
                             <span class="fw-bold text-dark fs-5" id="txt-subtotal">S/ 0.00</span>
                         </div>
                         
@@ -140,7 +144,7 @@
                         </div>
                         
                         <div class="total-row final">
-                            <span>TOTAL</span>
+                            <span>TOTAL A PAGAR</span>
                             <span id="txt-total">S/ 0.00</span>
                         </div>
 
@@ -154,6 +158,7 @@
         </form>
     </div>
 
+    <!-- Script de lógica matemática -->
     <script>
         const listaServicios = @json($servicios);
         let contadorFilas = 0;
@@ -161,15 +166,13 @@
         function agregarFila() {
             const tbody = document.querySelector('#tabla-detalles tbody');
             
-            let opciones = '<option value="" selected disabled>Seleccione...</option>';
+            let opciones = '<option value="" selected disabled>-- Despliegue para seleccionar servicio --</option>';
             listaServicios.forEach(s => {
-                opciones += `<option value="${s.id}" data-precio="${s.precio_base}">${s.nombre}</option>`;
+                opciones += `<option value="${s.id}" data-precio="${s.precio_base}">${s.nombre} (Referencia: S/ ${s.precio_base})</option>`;
             });
 
             const nuevaFila = document.createElement('tr');
             nuevaFila.id = `fila-${contadorFilas}`;
-            
-            // Reestructuramos el HTML de la fila para tener APLIC y SERV
             nuevaFila.innerHTML = `
                 <td style="padding-left: 25px;">
                     <select class="form-select fw-bold text-primary select-servicio" name="servicios[${contadorFilas}][id]" onchange="cargarPrecioOriginal(${contadorFilas})" required>
@@ -177,16 +180,10 @@
                     </select>
                 </td>
                 <td>
-                    <input type="text" class="form-control text-center text-muted bg-light border-0" value="GLB" readonly>
+                    <input type="number" class="form-control text-center input-cantidad fw-bold" name="servicios[${contadorFilas}][cantidad]" value="1" min="1" oninput="calcularTotales()" required>
                 </td>
                 <td>
-                    <input type="number" class="form-control text-center input-aplic fw-bold" name="servicios[${contadorFilas}][aplic]" value="1" min="1" oninput="calcularTotales()" required>
-                </td>
-                <td>
-                    <input type="number" class="form-control text-center input-serv fw-bold" name="servicios[${contadorFilas}][serv]" value="1" min="1" oninput="calcularTotales()" required>
-                </td>
-                <td>
-                    <input type="number" step="0.01" class="form-control text-end input-precio fw-bold text-primary" name="servicios[${contadorFilas}][precio]" value="0.00" min="0" oninput="calcularTotales()" required>
+                    <input type="number" step="0.01" class="form-control text-end input-precio fw-bold" name="servicios[${contadorFilas}][precio]" value="0.00" min="0" oninput="calcularTotales()" required>
                 </td>
                 <td class="text-end fw-bold text-dark fs-5 col-subtotal" style="vertical-align: middle;">S/ 0.00</td>
                 <td class="text-center" style="vertical-align: middle;">
@@ -225,23 +222,17 @@
             const filas = document.querySelectorAll('#tabla-detalles tbody tr');
 
             filas.forEach(fila => {
-                // Ahora capturamos Aplic, Serv y Precio
-                const aplicInput = fila.querySelector('.input-aplic');
-                const servInput = fila.querySelector('.input-serv');
+                const cantidadInput = fila.querySelector('.input-cantidad');
                 const precioInput = fila.querySelector('.input-precio');
                 const subtotalTd = fila.querySelector('.col-subtotal');
 
-                let aplic = parseInt(aplicInput.value) || 0;
-                let serv = parseInt(servInput.value) || 0;
+                let cantidad = parseInt(cantidadInput.value) || 0;
                 let precio = parseFloat(precioInput.value) || 0;
 
-                // Prevenir valores extraños o negativos
-                if (aplic < 1) aplic = 1;
-                if (serv < 1) serv = 1;
+                if (cantidad < 1) cantidad = 1;
                 if (precio < 0) precio = 0;
 
-                // LA FÓRMULA MAESTRA
-                let subtotalItem = aplic * serv * precio;
+                let subtotalItem = cantidad * precio;
                 subtotalAcumulado += subtotalItem;
 
                 subtotalTd.innerText = `S/ ${subtotalItem.toFixed(2)}`;

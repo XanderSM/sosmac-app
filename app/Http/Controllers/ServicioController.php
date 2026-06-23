@@ -57,9 +57,19 @@ class ServicioController extends Controller
     // ELIMINAR: Borrar un servicio
     public function destroy($id)
     {
-        $servicio = Servicio::findOrFail($id);
-        $servicio->delete();
-
-        return redirect()->back()->with('success', 'Servicio eliminado del catálogo.');
+        try {
+            $servicio = \App\Models\Servicio::findOrFail($id);
+            $servicio->delete();
+            
+            return redirect()->back()->with('success', 'Servicio eliminado correctamente.');
+            
+        } catch (\Illuminate\Database\QueryException $e) {
+            // El código 23000 es el de violación de llave foránea en MySQL
+            if ($e->getCode() == "23000") {
+                return redirect()->back()->withErrors('No puedes eliminar este servicio porque ya forma parte del historial de una cotización. Si ya no lo ofreces, edítalo y cambia su estado a Inactivo.');
+            }
+            
+            return redirect()->back()->withErrors('Ocurrió un error en la base de datos al intentar eliminar el registro.');
+        }
     }
 }
