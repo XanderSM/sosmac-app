@@ -30,7 +30,7 @@
             <tbody>
                 @forelse($ordenes as $orden)
                 <tr>
-                    <td class="px-4 fw-bold text-dark">ORD-{{ str_pad($orden->id, 4, '0', STR_PAD_LEFT) }}</td>
+                    <td class="px-4 fw-bold text-primary">ORD-{{ str_pad($orden->id, 4, '0', STR_PAD_LEFT) }}</td>
                     <td>
                         <div class="fw-bold">{{ $orden->cotizacion->cliente->nombre_razon_social }}</div>
                         <small class="text-muted">Origen: COT-{{ str_pad($orden->cotizacion_id, 4, '0', STR_PAD_LEFT) }}</small>

@@ -101,8 +101,20 @@ class CotizacionController extends Controller
 
     public function descargarPdf($id)
     {
+        // 1. Buscamos la cotización
         $cotizacion = Cotizacion::with(['cliente', 'detalles.servicio'])->findOrFail($id);
-        $pdf = app('dompdf.wrapper')->loadView('admin.cotizaciones.pdf', compact('cotizacion'));
+    
+        // 2. Lógica de Simulación SUNAT: 
+        // Si es la primera vez que se descarga, el sistema lo marca como 'Emitido'
+        if ($cotizacion->estado_documento == 'Borrador') {
+        $cotizacion->update(['estado_documento' => 'Emitido']);
+        }
+
+        // 3. Generamos el PDF con tus configuraciones actuales
+        $pdf = app('dompdf.wrapper')->loadView('admin.cotizaciones.pdf', compact('cotizacion'))
+                    ->setOptions(['isRemoteEnabled' => true]);
+    
+        // 4. Retornamos la descarga
         return $pdf->download("Cotizacion-SOSMAC-00{$cotizacion->id}.pdf");
     }
 }

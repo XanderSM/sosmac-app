@@ -12,7 +12,7 @@
         .fw-bold { font-weight: bold; }
         
         /* Colores exactos del documento original */
-        .bg-cyan { background-color: #5bc0de; } /* Ajusta el tono hex si lo prefieres más claro (#4dd0e1) */
+        .bg-cyan { background-color: #5bc0de; } 
         .text-red { color: #ff0000; }
         
         /* Utilidades de bordes */
@@ -125,33 +125,87 @@
         </tbody>
     </table>
 
-    <table class="w-100" style="font-weight: bold; border-collapse: collapse; margin-bottom: 15px; font-size: 9px;">
+    <table class="w-100" style="font-weight: bold; border-collapse: collapse; margin-bottom: 10px; font-size: 9px;">
         <tr>
             <td width="35%" style="border: none;"></td>
-            
             <td width="50%" class="text-right" style="border: 1px solid #000; padding: 5px;"><u>COSTO DIRECTO</u></td>
             <td width="15%" class="text-center text-red" style="border: 1px solid #000; padding: 5px;">{{ number_format($cotizacion->subtotal, 2) }}</td>
         </tr>
         <tr>
             <td style="border: none;"></td>
-            
             <td class="text-right" style="border: none; padding: 5px; padding-right: 6px;"><u>DESCUENTO</u></td>
             <td class="bg-cyan" style="border: 1px solid #000; padding: 5px;"></td>
         </tr>
         <tr>
             <td style="border: none; text-align: left; padding-left: 60px;"><u>IGV</u></td>
-            
             <td class="text-right" style="border: 1px solid #000; padding: 5px;"><u>18.00%</u></td>
             <td class="text-center text-red" style="border: 1px solid #000; padding: 5px;">{{ number_format($cotizacion->igv, 2) }}</td>
         </tr>
         <tr>
             <td style="border: none;"></td>
-            
-            <td class="text-right" style="border: 1px solid #000; padding: 5px;"><u>TOTAL COSTO ANUAL FUMIGACIÓN Y DESRATIZACIÓN</u></td>
+            <td class="text-right" style="border: solid 1px #000; padding: 5px;"><u>TOTAL COSTO ANUAL FUMIGACIÓN Y DESRATIZACIÓN</u></td>
             <td class="text-center text-red" style="border: 1px solid #000; padding: 5px;">{{ number_format($cotizacion->total, 2) }}</td>
         </tr>
     </table>
 
+    <table class="w-100" style="margin-bottom: 15px; border-collapse: collapse; font-size: 9px;">
+        <tr>
+            <td width="65%" style="vertical-align: top; border: none; padding-right: 15px;">
+                <div style="font-weight: bold; border: 1px solid #000; padding: 6px; margin-bottom: 8px;">
+                    SON: {{ \App\Helpers\NumeroALetras::convertir($cotizacion->total) }}
+                </div>
+                
+                @php
+                    $rucEmisor = '20601474122'; 
+                    $tipoDoc = '01'; 
+                    $serie = 'C001'; 
+                    $numero = str_pad($cotizacion->id, 8, '0', STR_PAD_LEFT);
+                    $igvFormatted = number_format($cotizacion->igv, 2, '.', '');
+                    $totalFormatted = number_format($cotizacion->total, 2, '.', '');
+                    $fecha = $cotizacion->created_at ? $cotizacion->created_at->format('Y-m-d') : date('Y-m-d');
+                    $tipoDocCliente = strlen($cotizacion->cliente->documento) == 11 ? '6' : '1'; 
+                    $numDocCliente = $cotizacion->cliente->documento;
+
+                    // Cadena oficial de SUNAT
+                    $sunatString = "{$rucEmisor}|{$tipoDoc}|{$serie}|{$numero}|{$igvFormatted}|{$totalFormatted}|{$fecha}|{$tipoDocCliente}|{$numDocCliente}|";
+                    $qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=" . urlencode($sunatString);
+
+                    // TRUCO MAESTRO: Forzamos a PHP a ignorar la falta de certificados SSL en tu XAMPP local
+                    $contextoSsl = stream_context_create([
+                        "ssl" => [
+                            "verify_peer" => false,
+                            "verify_peer_name" => false,
+                        ],
+                    ]);
+
+                    // Descargamos el QR de internet y lo transformamos a Base64
+                    try {
+                        $qrContenido = file_get_contents($qrUrl, false, $contextoSsl);
+                        $qrBase64 = "data:image/png;base64," . base64_encode($qrContenido);
+                    } catch (\Exception $e) {
+                        $qrBase64 = null; 
+                    }
+                @endphp
+
+                <table style="border: none; width: 100%;">
+                    <tr>
+                        <td width="80px" style="border: none; padding: 0; vertical-align: middle;">
+                            @if($qrBase64)
+                                <img src="{{ $qrBase64 }}" alt="QR SUNAT" style="width: 70px; height: 70px; border: 1px solid #000; padding: 2px;">
+                            @else
+                                <div style="width: 70px; height: 70px; border: 1px solid #000; text-align: center; font-size: 8px; padding-top: 25px;">[QR ERROR]</div>
+                            @endif
+                        </td>
+                        <td style="border: none; padding-left: 10px; vertical-align: middle; font-size: 7.5px; color: #444; font-style: italic; line-height: 1.2;">
+                            Representación impresa de la Cotización Comercial.<br>
+                            Simulación de validación con firma digital y estándar de Facturación Electrónica SUNAT.
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            <td width="35%" style="border: none;"></td>
+        </tr>
+    </table>
     <table class="border-all w-100" style="margin-bottom: 20px;">
         <tr>
             <td colspan="2" class="bg-cyan fw-bold text-center">CONDICIONES DE VENTA</td>

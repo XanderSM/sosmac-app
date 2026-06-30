@@ -63,7 +63,7 @@
             <tbody>
                 @forelse($cotizaciones as $coti)
                 <tr>
-                    <td class="px-4 fw-bold">COT-{{ str_pad($coti->id, 4, '0', STR_PAD_LEFT) }}</td>
+                    <td class="px-4 fw-bold text-primary">C001-{{ str_pad($coti->id, 8, '0', STR_PAD_LEFT) }}</td>
                     <td>
                         <div class="fw-bold text-dark">{{ $coti->titulo_proyecto ?? 'S/T' }}</div>
                         <small class="text-muted">{{ $coti->cliente->nombre_razon_social }}</small>

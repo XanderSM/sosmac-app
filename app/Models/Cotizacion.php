@@ -20,7 +20,8 @@ class Cotizacion extends Model
         'subtotal',
         'igv',
         'total',
-        'estado'
+        'estado',
+        'estado_documento', // Agregado para controlar el estado oficial del documento
     ];
 
     // Relación: Una cotización pertenece a un cliente

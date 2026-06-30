@@ -13,7 +13,7 @@ class OrdenServicioController extends Controller
     {
         // Traemos las órdenes con su cotización, cliente y técnico asignado
         $ordenes = OrdenServicio::with(['cotizacion.cliente', 'tecnico'])
-            ->orderBy('fecha_programada', 'desc')
+            ->orderBy('id', 'desc')
             ->get();
 
         // Para el modal de Nueva Orden: Solo cotizaciones APROBADAS que NO tengan orden aún
