@@ -2,14 +2,13 @@
 
 namespace Database\Seeders;
 
+use Illuminate\Database\Seeder;
 use App\Models\Cliente;
+use App\Models\Servicio;
 use App\Models\Cotizacion;
 use App\Models\CotizacionDetalle;
 use App\Models\OrdenServicio;
-use App\Models\Producto;
-use App\Models\Servicio;
 use App\Models\User;
-use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
 
 class DemoDataSeeder extends Seeder
@@ -63,108 +62,63 @@ class DemoDataSeeder extends Seeder
             ]);
         }
 
-        // 2. Crear Productos
-        if (Producto::count() === 0) {
-            Producto::create([
-                'nombre' => 'Deltametrina 2.5% EC',
-                'tipo' => 'Químico',
-                'unidad_medida' => 'Litros',
-                'stock' => 50,
-                'stock_minimo' => 10,
-                'estado' => true,
-            ]);
+        // 2. Obtener o crear los Servicios base (requeridos para las cotizaciones)
+        $servicioDesinsectacion = Servicio::firstOrCreate(
+            ['nombre' => 'Desinsectación Integral'],
+            [
+                'descripcion' => 'Tratamiento contra insectos rastreros.',
+                'precio_base' => 32.00,
+                'estado' => true
+            ]
+        );
 
-            Producto::create([
-                'nombre' => 'Gel Cucarachicida Maxforce',
-                'tipo' => 'Químico',
-                'unidad_medida' => 'Tubos 30g',
-                'stock' => 100,
-                'stock_minimo' => 20,
-                'estado' => true,
-            ]);
+        $servicioDesinfeccion = Servicio::firstOrCreate(
+            ['nombre' => 'Desinfección de Áreas'],
+            [
+                'descripcion' => 'Desinfección de virus y bacterias por m2.',
+                'precio_base' => 40.00,
+                'estado' => true
+            ]
+        );
 
-            Producto::create([
-                'nombre' => 'Trampa Pegajosa para Roedores',
-                'tipo' => 'Trampa',
-                'unidad_medida' => 'Unidades',
-                'stock' => 300,
-                'stock_minimo' => 50,
-                'estado' => true,
-            ]);
+        $servicioDesratizacion = Servicio::firstOrCreate(
+            ['nombre' => 'Desratización Profesional'],
+            [
+                'descripcion' => 'Control de roedores con cebos certificados.',
+                'precio_base' => 65.00,
+                'estado' => true
+            ]
+        );
 
-            Producto::create([
-                'nombre' => 'Estación Cebadera Plástica',
-                'tipo' => 'Trampa',
-                'unidad_medida' => 'Unidades',
-                'stock' => 150,
-                'stock_minimo' => 15,
-                'estado' => true,
-            ]);
-
-            Producto::create([
-                'nombre' => 'Raticida Klerat Bloques',
-                'tipo' => 'Químico',
-                'unidad_medida' => 'Kilos',
-                'stock' => 40,
-                'stock_minimo' => 8,
-                'estado' => true,
-            ]);
-        }
-
-        // 3. Crear Servicios
-        if (Servicio::count() === 0) {
-            Servicio::create([
-                'nombre' => 'Servicio de Desinsectación General',
-                'descripcion' => 'Control de insectos rastreros y voladores (cucarachas, hormigas, moscas, etc.) en ambientes internos y externos.',
-                'precio_base' => 150.00,
-                'estado' => true,
-            ]);
-
-            Servicio::create([
-                'nombre' => 'Servicio de Desratización (Control de Roedores)',
-                'descripcion' => 'Inspección, colocación de estaciones cebaderas seguras y trampas pegajosas para control de ratas y ratones.',
-                'precio_base' => 180.00,
-                'estado' => true,
-            ]);
-
-            Servicio::create([
-                'nombre' => 'Desinfección Ambiental contra Patógenos',
-                'descripcion' => 'Nebulización en frío de amonio cuaternario para eliminación de virus, bacterias y hongos en superficies y ambiente.',
+        $servicioLimpieza = Servicio::firstOrCreate(
+            ['nombre' => 'Limpieza de Tanques'],
+            [
+                'descripcion' => 'Limpieza y lavado de reservorios de agua.',
                 'precio_base' => 120.00,
-                'estado' => true,
-            ]);
+                'estado' => true
+            ]
+        );
 
-            Servicio::create([
-                'nombre' => 'Control Integrado de Plagas en Restaurantes',
-                'descripcion' => 'Servicio mensual preventivo y correctivo diseñado especialmente para negocios de comida bajo lineamientos sanitarios (DIGESA).',
-                'precio_base' => 250.00,
-                'estado' => true,
-            ]);
-        }
-
-        // 4. Crear Cotizaciones
+        // 3. Crear Cotizaciones
         if (Cotizacion::count() === 0) {
             $cliente1 = Cliente::where('documento', '20123456789')->first();
             $cliente2 = Cliente::where('documento', '20987654321')->first();
             $cliente3 = Cliente::where('documento', '45678912')->first();
 
-            $servicioDesinsectacion = Servicio::where('nombre', 'like', '%Desinsectación%')->first();
-            $servicioDesratizacion = Servicio::where('nombre', 'like', '%Desratización%')->first();
-            $servicioRestaurante = Servicio::where('nombre', 'like', '%Restaurantes%')->first();
-
-            if ($cliente1 && $servicioRestaurante) {
+            if ($cliente1) {
                 // Cotizacion 1: Restaurante (Aprobada)
-                $subtotal = 250.00;
+                $sub1 = 150.00; // Desinsectación Integral
+                $sub2 = 120.00; // Limpieza de Tanques
+                $subtotal = $sub1 + $sub2;
                 $igv = $subtotal * 0.18;
                 $total = $subtotal + $igv;
 
                 $cot1 = Cotizacion::create([
                     'cliente_id' => $cliente1->id,
-                    'titulo_proyecto' => 'Fumigación y Control Integral de Plagas - Local Larco',
+                    'titulo_proyecto' => 'Fumigación y Limpieza de Reservorios - Local Larco',
                     'direccion_proyecto' => 'Av. Larco 456, Miraflores',
-                    'notes_areas' => 'Cocina, comedor, almacén y servicios higiénicos.', // Wait, wait, is it 'notes_areas' or 'notas_areas'? Let's check model! It's 'notas_areas'! Let me fix this.
-                    'notas_areas' => 'Cocina, comedor, almacén y servicios higiénicos.',
-                    'notas_materiales' => 'Uso de Deltametrina y gel Maxforce.',
+                    'notas_areas' => 'Cocina, comedor, almacén y cisterna de agua.',
+                    'notas_materiales' => 'Uso de Deltametrina, gel Maxforce y desinfectantes clorados.',
                     'subtotal' => $subtotal,
                     'igv' => $igv,
                     'total' => $total,
@@ -174,10 +128,18 @@ class DemoDataSeeder extends Seeder
 
                 CotizacionDetalle::create([
                     'cotizacion_id' => $cot1->id,
-                    'servicio_id' => $servicioRestaurante->id,
+                    'servicio_id' => $servicioDesinsectacion->id,
                     'cantidad' => 1,
-                    'precio_unitario' => 250.00,
-                    'subtotal' => 250.00,
+                    'precio_unitario' => 150.00,
+                    'subtotal' => $sub1,
+                ]);
+
+                CotizacionDetalle::create([
+                    'cotizacion_id' => $cot1->id,
+                    'servicio_id' => $servicioLimpieza->id,
+                    'cantidad' => 1,
+                    'precio_unitario' => 120.00,
+                    'subtotal' => $sub2,
                 ]);
 
                 // Crear Orden de Servicio para esta cotización aprobada
@@ -191,14 +153,14 @@ class DemoDataSeeder extends Seeder
                     'observaciones_admin' => 'El local abre a las 10:00 AM, el técnico debe estar listo a las 9:15 AM en puerta.',
                     'trabajos_autorizados_por' => 'Carlos Buen Sabor',
                     'pedido_recibido_por' => 'Administrador Principal',
-                    'trabajo_descripcion' => 'Fumigación mensual de cocina y zonas comunes del restaurante.',
+                    'trabajo_descripcion' => 'Fumigación mensual de cocina y limpieza desinfección de tanque de agua.',
                 ]);
             }
 
-            if ($cliente2 && $servicioDesratizacion && $servicioDesinsectacion) {
+            if ($cliente2) {
                 // Cotizacion 2: Supermercado Metro (Aprobada)
-                $sub1 = 180.00 * 2; // Desratizacion x 2
-                $sub2 = 150.00 * 1; // Desinsectacion x 1
+                $sub1 = 180.00 * 2; // Desratización Profesional x 2
+                $sub2 = 150.00 * 1; // Desinsectación Integral x 1
                 $subtotal = $sub1 + $sub2;
                 $igv = $subtotal * 0.18;
                 $total = $subtotal + $igv;
@@ -208,7 +170,7 @@ class DemoDataSeeder extends Seeder
                     'titulo_proyecto' => 'Control de Plagas y Desratización - Tienda Los Olivos',
                     'direccion_proyecto' => 'Av. Alfredo Mendiola 1400, Los Olivos',
                     'notas_areas' => 'Almacén de abarrotes, trastienda, zona de descarga.',
-                    'notas_materiales' => 'Uso de estaciones cebaderas plásticas con raticida Klerat y trampas pegajosas.',
+                    'notas_materiales' => 'Uso de estaciones cebaderas plásticas con raticida y trampas pegajosas.',
                     'subtotal' => $subtotal,
                     'igv' => $igv,
                     'total' => $total,
@@ -247,18 +209,18 @@ class DemoDataSeeder extends Seeder
                 ]);
             }
 
-            if ($cliente3 && $servicioDesinsectacion) {
+            if ($cliente3) {
                 // Cotizacion 3: Juan Pérez (Pendiente)
-                $subtotal = 150.00;
+                $subtotal = 120.00; // Desinfección de Áreas
                 $igv = $subtotal * 0.18;
                 $total = $subtotal + $igv;
 
                 $cot3 = Cotizacion::create([
                     'cliente_id' => $cliente3->id,
-                    'titulo_proyecto' => 'Desinsectación de Residencia Particular',
+                    'titulo_proyecto' => 'Desinfección Preventiva de Residencia',
                     'direccion_proyecto' => 'Calle Las Orquídeas 789, San Isidro',
-                    'notas_areas' => 'Sala, cocina, jardín interno y habitaciones.',
-                    'notas_materiales' => 'Insecticidas de baja toxicidad y sin olor.',
+                    'notas_areas' => 'Toda la casa incluyendo cochera y patio trasero.',
+                    'notas_materiales' => 'Desinfectante amonio cuaternario quinta generación.',
                     'subtotal' => $subtotal,
                     'igv' => $igv,
                     'total' => $total,
@@ -268,10 +230,10 @@ class DemoDataSeeder extends Seeder
 
                 CotizacionDetalle::create([
                     'cotizacion_id' => $cot3->id,
-                    'servicio_id' => $servicioDesinsectacion->id,
+                    'servicio_id' => $servicioDesinfeccion->id,
                     'cantidad' => 1,
-                    'precio_unitario' => 150.00,
-                    'subtotal' => 150.00,
+                    'precio_unitario' => 120.00,
+                    'subtotal' => $subtotal,
                 ]);
             }
         }
