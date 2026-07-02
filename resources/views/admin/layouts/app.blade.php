@@ -27,6 +27,32 @@
         
         .main-content { margin-left: 250px; padding: 40px; width: calc(100% - 250px); min-height: 100vh; }
         .card-panel { background: white; border-radius: 16px; padding: 25px; border: 1px solid #edf2f9; box-shadow: 0 5px 15px rgba(0,0,0,0.03); }
+
+        /* BOTONES PERSONALIZADOS PREMIUM (AZUL SOSMAC) */
+        .btn-custom {
+            background: linear-gradient(135deg, #11235A, #1E5DDB);
+            color: white !important;
+            font-weight: 700;
+            border-radius: 8px;
+            padding: 10px 22px;
+            border: none;
+            box-shadow: 0 4px 10px rgba(30, 93, 219, 0.25);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+        }
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(30, 93, 219, 0.35);
+            background: linear-gradient(135deg, #1E5DDB, #11235A);
+            color: white !important;
+        }
+        .btn-custom:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 6px rgba(30, 93, 219, 0.2);
+        }
     </style>
     @stack('styles') 
 </head>
