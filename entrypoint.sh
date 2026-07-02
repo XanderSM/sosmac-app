@@ -8,8 +8,8 @@ php artisan config:clear
 php artisan route:clear
 php artisan view:clear
 
-# Ejecutar migraciones
-php artisan migrate --force
+# Ejecutar migraciones y poblar base de datos
+php artisan migrate --seed --force
 
 # Iniciar Apache
 exec apache2-foreground
