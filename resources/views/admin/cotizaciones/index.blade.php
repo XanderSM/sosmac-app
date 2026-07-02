@@ -57,6 +57,7 @@
                     <th class="py-3">Proyecto / Cliente</th>
                     <th class="py-3 text-end">Total (S/)</th>
                     <th class="py-3 text-center">Estado</th>
+                    <th class="py-3 text-center">Emisión SUNAT</th>
                     <th class="py-3 text-center">Acciones</th>
                 </tr>
             </thead>
@@ -75,8 +76,20 @@
                         @else <span class="badge bg-warning text-dark">Pendiente</span> @endif
                     </td>
                     <td class="text-center">
+                        @php
+                            $estadoEmision = $coti->estado_documento ?? 'Borrador';
+                        @endphp
+                        @if($estadoEmision == 'Emitido')
+                            <span class="badge bg-success">Aceptado</span>
+                        @elseif($estadoEmision == 'Enviado')
+                            <span class="badge bg-info text-dark">Enviado</span>
+                        @else
+                            <span class="badge bg-secondary">Borrador</span>
+                        @endif
+                    </td>
+                    <td class="text-center">
                         <!-- Botón Descargar PDF -->
-                        <a href="{{ route('cotizaciones.pdf', $coti->id) }}" class="btn btn-sm btn-outline-secondary me-1" title="Descargar PDF">
+                        <a href="{{ route('cotizaciones.pdf', $coti->id) }}" class="btn btn-sm btn-outline-secondary me-1" title="Descargar PDF" download>
                             <i class="bi bi-file-earmark-pdf-fill"></i>
                         </a>
                         
@@ -108,7 +121,7 @@
                     </td>
                 </tr>
                 @empty
-                <tr><td colspan="5" class="text-center py-5 text-muted">Aún no hay cotizaciones. Abre el cotizador para iniciar.</td></tr>
+                <tr><td colspan="6" class="text-center py-5 text-muted">Aún no hay cotizaciones. Abre el cotizador para iniciar.</td></tr>
                 @endforelse
             </tbody>
         </table>

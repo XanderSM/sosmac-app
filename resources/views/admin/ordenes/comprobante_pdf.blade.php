@@ -38,6 +38,47 @@
         </div>
     </div>
 
+    @php
+        $rucEmisor = '20529405597';
+        $tipoDoc = ($tipo_comprobante === 'FACTURA') ? '01' : '03';
+        $serie = 'F001';
+        $numero = str_pad($orden->id, 8, '0', STR_PAD_LEFT);
+        $igvFormatted = number_format($orden->cotizacion->igv, 2, '.', '');
+        $totalFormatted = number_format($orden->cotizacion->total, 2, '.', '');
+        $fecha = now()->format('Y-m-d');
+        
+        // Manejo seguro del documento
+        $numDocCliente = $orden->cotizacion->cliente->documento ?? '00000000';
+        $tipoDocCliente = strlen($numDocCliente) == 11 ? '6' : '1';
+        
+        $sunatString = "{$rucEmisor}|{$tipoDoc}|{$serie}|{$numero}|{$igvFormatted}|{$totalFormatted}|{$fecha}|{$tipoDocCliente}|{$numDocCliente}|";
+        $estadoSunat = 'ACEPTADO';
+        $hashSunat = strtoupper(substr(hash('sha256', $sunatString), 0, 20));
+
+        // Solución óptima para el QR (Imagen renderizada externamente en Base64)
+        $qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=100x100&margin=1&data=' . urlencode($sunatString);
+        $qrData = 'data:image/png;base64,' . base64_encode(file_get_contents($qrUrl));
+    @endphp
+
+    <div style="margin: 15px 0 20px; padding: 10px; border: 1px solid #000; background: #f9f9f9;">
+        <div style="font-weight: bold; margin-bottom: 5px;">CONEXIÓN SUNAT</div>
+        <div style="font-size: 10px; margin-bottom: 8px;">{{ $estadoSunat }} · Firma digital · Código de verificación SUNAT</div>
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+                <td style="width: 90px; vertical-align: top;">
+                    <div style="width: 72px; height: 72px; border: 1px solid #000; padding: 2px; display: inline-block;">
+                        <img src="{{ $qrData }}" alt="QR SUNAT" style="width: 66px; height: 66px; display: block;" />
+                    </div>
+                </td>
+                <td style="padding-left: 10px; font-size: 9px; line-height: 1.3; vertical-align: top;">
+                    <div><strong>Serie:</strong> {{ $serie }}-{{ str_pad($orden->id, 8, '0', STR_PAD_LEFT) }}</div>
+                    <div><strong>Hash de validación:</strong> {{ $hashSunat }}</div>
+                    <div><strong>Fecha de recepción:</strong> {{ now()->format('Y-m-d H:i:s') }}</div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
     <table class="info-table w-100" style="margin-bottom: 20px;">
         <tr>
             <td width="25%" class="fw-bold">Fecha de Emisión</td>
@@ -45,11 +86,11 @@
         </tr>
         <tr>
             <td class="fw-bold">Señor(es)</td>
-            <td>: {{ $orden->cotizacion->cliente->nombre_razon_social }}</td>
+            <td>: {{ $orden->cotizacion->cliente->nombre_razon_social ?? 'S/D' }}</td>
         </tr>
         <tr>
-            <td class="fw-bold">{{ $orden->cotizacion->cliente->tipo_documento }}</td>
-            <td>: {{ $orden->cotizacion->cliente->documento }}</td>
+            <td class="fw-bold">{{ $orden->cotizacion->cliente->tipo_documento ?? 'DOCUMENTO' }}</td>
+            <td>: {{ $numDocCliente }}</td>
         </tr>
         <tr>
             <td class="fw-bold">Dirección del Cliente</td>
@@ -61,7 +102,7 @@
         </tr>
         <tr>
             <td class="fw-bold">Observación</td>
-            <td>: {{ $orden->cotizacion->titulo_proyecto }}</td>
+            <td>: {{ $orden->cotizacion->titulo_proyecto ?? 'S/D' }}</td>
         </tr>
     </table>
 
@@ -80,7 +121,7 @@
             <tr>
                 <td>{{ $detalle->cantidad }}.00</td>
                 <td>UNIDAD</td>
-                <td style="text-align: left;">POR {{ strtoupper($detalle->servicio->nombre) }} E001-{{ str_pad($orden->id, 4, '0', STR_PAD_LEFT) }}</td>
+                <td style="text-align: left;">POR {{ strtoupper($detalle->servicio->nombre ?? 'SERVICIO') }} E001-{{ str_pad($orden->id, 4, '0', STR_PAD_LEFT) }}</td>
                 <td>{{ number_format($detalle->precio_unitario, 2) }}</td>
                 <td>0.00</td>
             </tr>

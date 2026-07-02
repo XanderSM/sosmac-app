@@ -32,7 +32,7 @@
                 <tr>
                     <td class="px-4 fw-bold text-primary">ORD-{{ str_pad($orden->id, 4, '0', STR_PAD_LEFT) }}</td>
                     <td>
-                        <div class="fw-bold">{{ $orden->cotizacion->cliente->nombre_razon_social }}</div>
+                        <div class="fw-bold">{{ $orden->cotizacion->cliente->nombre_razon_social ?? 'Sin Cliente' }}</div>
                         <small class="text-muted">Origen: COT-{{ str_pad($orden->cotizacion_id, 4, '0', STR_PAD_LEFT) }}</small>
                     </td>
                     <td>
@@ -46,11 +46,11 @@
                         @else <span class="badge bg-warning text-dark">Pendiente</span> @endif
                     </td>
                     <td class="text-center">
-                        <a href="{{ route('ordenes.pdf_orden', $orden->id) }}" class="btn btn-sm btn-outline-warning me-1" title="Descargar Orden de Servicio">
+                        <a href="{{ route('ordenes.pdf_orden', $orden->id) }}" class="btn btn-sm btn-outline-warning me-1" title="Descargar Orden de Servicio" download>
                             <i class="bi bi-clipboard-check-fill"></i>
                         </a>
     
-                        <a href="{{ route('ordenes.pdf_comprobante', $orden->id) }}" class="btn btn-sm btn-outline-primary me-1" title="Generar Boleta/Factura">
+                        <a href="{{ route('ordenes.pdf_comprobante', $orden->id) }}" class="btn btn-sm btn-outline-primary me-1" title="Generar Boleta/Factura" download>
                             <i class="bi bi-receipt"></i>
                         </a>
     
@@ -61,7 +61,7 @@
                 </tr>
 
                 <div class="modal fade" id="modalEditar{{ $orden->id }}" tabindex="-1">
-                    <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-dialog modal-lg modal-dialog-centered">
                         <div class="modal-content border-0 shadow" style="border-radius: 16px;">
                             <div class="modal-header border-0 pb-0 px-4 pt-4">
                                 <h5 class="modal-title fw-bold text-dark"><i class="bi bi-pencil-square text-primary me-2"></i>Editar Orden ORD-{{ str_pad($orden->id, 4, '0', STR_PAD_LEFT) }}</h5>
@@ -71,32 +71,74 @@
                                 <form action="{{ route('ordenes.update', $orden->id) }}" method="POST">
                                     @csrf
                                     @method('PUT')
-                                    <div class="mb-3">
-                                        <label class="form-label fw-bold small text-muted">REASIGNAR TÉCNICO</label>
-                                        <select class="form-select bg-light border-0" name="tecnico_id" required>
-                                            @foreach($tecnicos as $tecnico)
-                                                <option value="{{ $tecnico->id }}" {{ $orden->tecnico_id == $tecnico->id ? 'selected' : '' }}>{{ $tecnico->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
                                     <div class="row g-3 mb-3">
-                                        <div class="col-6">
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-bold small text-muted">REASIGNAR TÉCNICO</label>
+                                            <select class="form-select bg-light border-0" name="tecnico_id" required>
+                                                @foreach($tecnicos as $tecnico)
+                                                    <option value="{{ $tecnico->id }}" {{ $orden->tecnico_id == $tecnico->id ? 'selected' : '' }}>{{ $tecnico->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-bold small text-muted">ESTADO DE LA ORDEN</label>
+                                            <select class="form-select bg-light border-0" name="estado" required>
+                                                <option value="Pendiente" {{ $orden->estado == 'Pendiente' ? 'selected' : '' }}>Pendiente</option>
+                                                <option value="En Ruta" {{ $orden->estado == 'En Ruta' ? 'selected' : '' }}>En Ruta (Técnico en camino)</option>
+                                                <option value="Completada" {{ $orden->estado == 'Completada' ? 'selected' : '' }}>Completada</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
                                             <label class="form-label fw-bold small text-muted">FECHA</label>
                                             <input type="date" class="form-control bg-light border-0" name="fecha_programada" value="{{ $orden->fecha_programada }}" required>
                                         </div>
-                                        <div class="col-6">
+                                        <div class="col-md-6">
                                             <label class="form-label fw-bold small text-muted">HORA</label>
                                             <input type="time" class="form-control bg-light border-0" name="hora_programada" value="{{ $orden->hora_programada }}" required>
                                         </div>
+                                        
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-bold small text-muted">TRABAJOS AUTORIZADOS POR</label>
+                                            <input type="text" class="form-control bg-light border-0" name="trabajos_autorizados_por" value="{{ $orden->trabajos_autorizados_por ?? '' }}">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-bold small text-muted">PEDIDO RECIBIDO POR</label>
+                                            <input type="text" class="form-control bg-light border-0" name="pedido_recibido_por" value="{{ $orden->pedido_recibido_por ?? '' }}">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-bold small text-muted">TRABAJO DESCRIPCIÓN</label>
+                                            <textarea class="form-control bg-light border-0" name="trabajo_descripcion" rows="2">{{ $orden->trabajo_descripcion ?? '' }}</textarea>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-bold small text-muted">COMENTARIOS ADICIONALES</label>
+                                            <textarea class="form-control bg-light border-0" name="comentarios_adicionales" rows="2">{{ $orden->comentarios_adicionales ?? '' }}</textarea>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-bold small text-muted">FECHA SERV. EJECUTADO</label>
+                                            <input type="date" class="form-control bg-light border-0" name="fecha_servicio_ejecutado" value="{{ $orden->fecha_servicio_ejecutado ? \Carbon\Carbon::parse($orden->fecha_servicio_ejecutado)->format('Y-m-d') : '' }}">
+                                        </div>
+                                        <div class="col-md-12">
+                                            <label class="form-label fw-bold small text-muted">DESCUENTO APLICADO (S/)</label>
+                                            <input type="number" step="0.01" class="form-control bg-light border-0" name="descuento" value="{{ $orden->descuento ?? '0.00' }}">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-bold small text-muted">PRODUCTO UTILIZADO</label>
+                                            <select class="form-select bg-light border-0" name="producto_id">
+                                                <option value="">Ninguno</option>
+                                                @foreach($productos as $producto)
+                                                    <option value="{{ $producto->id }}">{{ $producto->nombre }} (Stock: {{ $producto->stock }})</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-bold small text-muted">CANTIDAD UTILIZADA</label>
+                                            <input type="number" min="1" class="form-control bg-light border-0" name="cantidad_usada" placeholder="Ej. 2">
+                                        </div>
+                                        <div class="col-md-12">
+                                            <small class="text-muted">Si marcas la orden como completada y eliges un producto, el stock se descontará automáticamente del inventario.</small>
+                                        </div>
                                     </div>
-                                    <div class="mb-3">
-                                        <label class="form-label fw-bold small text-muted">ESTADO DE LA ORDEN</label>
-                                        <select class="form-select bg-light border-0" name="estado" required>
-                                            <option value="Pendiente" {{ $orden->estado == 'Pendiente' ? 'selected' : '' }}>Pendiente</option>
-                                            <option value="En Ruta" {{ $orden->estado == 'En Ruta' ? 'selected' : '' }}>En Ruta (Técnico en camino)</option>
-                                            <option value="Completada" {{ $orden->estado == 'Completada' ? 'selected' : '' }}>Completada</option>
-                                        </select>
-                                    </div>
+                                    
                                     <div class="d-flex justify-content-end gap-2 mt-4">
                                         <button type="button" class="btn btn-light fw-bold" data-bs-dismiss="modal">Cancelar</button>
                                         <button type="submit" class="btn btn-primary fw-bold">Actualizar Orden</button>
@@ -114,7 +156,7 @@
     </div>
 
     <div class="modal fade" id="modalNuevaOrden" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content border-0 shadow" style="border-radius: 16px;">
                 <div class="modal-header border-0 pb-0 px-4 pt-4">
                     <h5 class="modal-title fw-bold text-dark"><i class="bi bi-calendar-plus text-primary me-2"></i>Programar Servicio</h5>
@@ -123,38 +165,69 @@
                 <div class="modal-body p-4">
                     <form action="{{ route('ordenes.store') }}" method="POST">
                         @csrf
-                        <div class="mb-3">
-                            <label class="form-label fw-bold small text-muted">COTIZACIÓN APROBADA (ORIGEN)</label>
-                            <select class="form-select bg-light border-0" name="cotizacion_id" required>
-                                <option value="" disabled selected>Seleccione la cotización base...</option>
-                                @foreach($cotizaciones as $coti)
-                                    <option value="{{ $coti->id }}">COT-{{ str_pad($coti->id, 4, '0', STR_PAD_LEFT) }} - {{ $coti->cliente->nombre_razon_social }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold small text-muted">ASIGNAR TÉCNICO</label>
-                            <select class="form-select bg-light border-0" name="tecnico_id" required>
-                                <option value="" disabled selected>Seleccione un técnico...</option>
-                                @foreach($tecnicos as $tecnico)
-                                    <option value="{{ $tecnico->id }}">{{ $tecnico->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
                         <div class="row g-3 mb-3">
-                            <div class="col-6">
+                            <div class="col-md-12">
+                                <label class="form-label fw-bold small text-muted">COTIZACIÓN APROBADA (ORIGEN)</label>
+                                <select class="form-select bg-light border-0" name="cotizacion_id" required>
+                                    <option value="" disabled selected>Seleccione la cotización base...</option>
+                                    @foreach($cotizaciones as $coti)
+                                        <option value="{{ $coti->id }}">COT-{{ str_pad($coti->id, 4, '0', STR_PAD_LEFT) }} - {{ $coti->cliente->nombre_razon_social }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label fw-bold small text-muted">ASIGNAR TÉCNICO</label>
+                                <select class="form-select bg-light border-0" name="tecnico_id" required>
+                                    <option value="" disabled selected>Seleccione un técnico...</option>
+                                    @foreach($tecnicos as $tecnico)
+                                        <option value="{{ $tecnico->id }}">{{ $tecnico->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-6">
                                 <label class="form-label fw-bold small text-muted">FECHA</label>
                                 <input type="date" class="form-control bg-light border-0" name="fecha_programada" required>
                             </div>
-                            <div class="col-6">
+                            <div class="col-md-6">
                                 <label class="form-label fw-bold small text-muted">HORA DE LLEGADA</label>
                                 <input type="time" class="form-control bg-light border-0" name="hora_programada" required>
                             </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-muted">TRABAJOS AUTORIZADOS POR</label>
+                                <input type="text" class="form-control bg-light border-0" name="trabajos_autorizados_por" placeholder="Nombre de quien autoriza">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-muted">PEDIDO RECIBIDO POR</label>
+                                <input type="text" class="form-control bg-light border-0" name="pedido_recibido_por" placeholder="Nombre de tu personal">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-muted">TRABAJO DESCRIPCIÓN</label>
+                                <textarea class="form-control bg-light border-0" name="trabajo_descripcion" rows="2" placeholder="Resumen del trabajo..."></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-muted">COMENTARIOS ADICIONALES</label>
+                                <textarea class="form-control bg-light border-0" name="comentarios_adicionales" rows="2" placeholder="Notas extra..."></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-muted">PRODUCTO UTILIZADO</label>
+                                <select class="form-select bg-light border-0" name="producto_id">
+                                    <option value="">Ninguno</option>
+                                    @foreach($productos as $producto)
+                                        <option value="{{ $producto->id }}">{{ $producto->nombre }} (Stock: {{ $producto->stock }})</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-muted">CANTIDAD UTILIZADA</label>
+                                <input type="number" min="1" class="form-control bg-light border-0" name="cantidad_usada" placeholder="Ej. 2">
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label fw-bold small text-muted">DESCUENTO APLICADO (S/)</label>
+                                <input type="number" step="0.01" class="form-control bg-light border-0" name="descuento" value="0.00">
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold small text-muted">OBSERVACIONES INTERNAS</label>
-                            <textarea class="form-control bg-light border-0" name="observaciones_admin" rows="2" placeholder="Instrucciones para el técnico..."></textarea>
-                        </div>
+                        
                         <div class="d-flex justify-content-end gap-2 mt-4">
                             <button type="button" class="btn btn-light fw-bold" data-bs-dismiss="modal">Cancelar</button>
                             <button type="submit" class="btn btn-custom">Agendar Orden</button>

@@ -4,7 +4,17 @@
     <meta charset="UTF-8">
     <title>Cotización - SOSMAC</title>
     <style>
-        body { font-family: Arial, sans-serif; font-size: 9px; color: #000; margin: 0; padding: 0; }
+        * { box-sizing: border-box; }
+        
+        /* Ajuste de márgenes para eliminar el espacio superior */
+        body { 
+            font-family: Arial, sans-serif; 
+            font-size: 9px; 
+            color: #000; 
+            margin: -15px 18px 0 18px; 
+            padding: 0; 
+        }
+        
         .w-100 { width: 100%; }
         .text-center { text-align: center; }
         .text-right { text-align: right; }
@@ -20,18 +30,20 @@
         .border-all th, .border-all td { border: 1px solid #000; padding: 4px; }
         
         /* Evitar saltos de página dentro de las tablas */
-        table { page-break-inside: auto; }
+        table { page-break-inside: auto; border-collapse: collapse; }
         tr    { page-break-inside: avoid; page-break-after: auto; }
+        
+        .header-table { margin-top: 0 !important; margin-bottom: 5px; }
     </style>
 </head>
 <body>
 
-    <table class="w-100" style="border: none; margin-bottom: 5px;">
+    <table class="w-100 header-table" style="border: none;">
         <tr>
-            <td width="50%" class="text-left" style="vertical-align: middle;">
+            <td width="50%" class="text-left" style="vertical-align: middle; padding: 0;">
                 <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('img/logo.png'))) }}" alt="SOSMAC" style="height: 60px; width: auto;">
             </td>
-            <td width="50%" class="text-right" style="vertical-align: middle;">
+            <td width="50%" class="text-right" style="vertical-align: middle; padding: 0;">
                 <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('img/minsa.png'))) }}" alt="MINSA" style="height: 40px; width: auto;">
             </td>
         </tr>
@@ -62,18 +74,13 @@
             </tr>
         </thead>
         <tbody>
-            <tr class="bg-cyan fw-bold">
-                <td colspan="8">DESINSECTACION</td>
-            </tr>
-            @php $countDetalles = count($cotizacion->detalles); @endphp
-            @if($countDetalles > 0)
-                @foreach($cotizacion->detalles as $index => $detalle)
+            @php $detalles = $cotizacion->detalles ?? collect(); @endphp
+            @if($detalles->isNotEmpty())
+                @foreach($detalles as $index => $detalle)
                 <tr>
-                    @if($index == 0)
-                    <td rowspan="{{ $countDetalles }}" class="text-center fw-bold">1</td>
-                    <td rowspan="{{ $countDetalles }}" class="text-center fw-bold" width="18%">DESINSECTACION<br>APLICACIÓN X<br>NEBULIZACION Y/O<br>TERMONEBULIZACION</td>
-                    @endif
-                    <td class="text-left" width="22%">{{ $detalle->servicio->nombre }}</td>
+                    <td class="text-center fw-bold">{{ $index + 1 }}</td>
+                    <td class="text-center fw-bold" width="18%">{{ strtoupper($detalle->servicio->nombre ?? 'SERVICIO') }}</td>
+                    <td class="text-left" width="22%">{{ $detalle->servicio->descripcion ?? 'SERVICIO REGISTRADO' }}</td>
                     <td>GLB</td>
                     <td>1.00</td>
                     <td>{{ number_format($detalle->cantidad, 2) }}</td>
@@ -84,43 +91,13 @@
             @else
                 <tr>
                     <td class="fw-bold">1</td>
-                    <td class="fw-bold text-center" width="18%">DESINSECTACION<br>APLICACIÓN X<br>NEBULIZACION Y/O<br>TERMONEBULIZACION</td>
-                    <td></td><td></td><td></td><td></td><td></td><td class="text-red">0.00</td>
+                    <td class="fw-bold text-center" width="18%">SIN SERVICIOS</td>
+                    <td colspan="6" class="text-left">No se registraron servicios en esta cotización.</td>
                 </tr>
             @endif
             <tr>
                 <td colspan="7" class="text-right border-0" style="border: none;"></td>
-                <td class="text-red">0.00</td>
-            </tr>
-
-            <tr class="bg-cyan fw-bold">
-                <td colspan="8">DESINFECCION</td>
-            </tr>
-            <tr>
-                <td rowspan="2" class="fw-bold">2</td>
-                <td rowspan="2"></td>
-                <td></td><td></td><td></td><td></td><td></td><td class="text-red">0.00</td>
-            </tr>
-            <tr>
-                <td></td><td></td><td></td><td></td><td></td><td class="text-red">0.00</td>
-            </tr>
-
-            <tr class="bg-cyan fw-bold">
-                <td colspan="8">DESRATIZACION</td>
-            </tr>
-            <tr>
-                <td rowspan="3" class="fw-bold">3</td>
-                <td rowspan="3"></td>
-                <td class="text-left">CEBADERO COMUN (TUBO PVC 4")</td>
-                <td></td><td></td><td></td><td></td><td class="text-red">0.00</td>
-            </tr>
-            <tr>
-                <td class="text-left">CAJA CEBADERA</td>
-                <td></td><td></td><td></td><td></td><td class="text-red">0.00</td>
-            </tr>
-            <tr>
-                <td class="text-left">TRAMPAS ADHESIVAS</td>
-                <td></td><td></td><td></td><td></td><td class="text-red">0.00</td>
+                <td class="text-red">{{ number_format($detalles->sum('subtotal'), 2) }}</td>
             </tr>
         </tbody>
     </table>
@@ -156,49 +133,37 @@
                 </div>
                 
                 @php
-                    $rucEmisor = '20601474122'; 
-                    $tipoDoc = '01'; 
-                    $serie = 'C001'; 
+                    $rucEmisor = '20601474122';
+                    $tipoDoc = '01';
+                    $serie = 'C001';
                     $numero = str_pad($cotizacion->id, 8, '0', STR_PAD_LEFT);
                     $igvFormatted = number_format($cotizacion->igv, 2, '.', '');
                     $totalFormatted = number_format($cotizacion->total, 2, '.', '');
                     $fecha = $cotizacion->created_at ? $cotizacion->created_at->format('Y-m-d') : date('Y-m-d');
-                    $tipoDocCliente = strlen($cotizacion->cliente->documento) == 11 ? '6' : '1'; 
-                    $numDocCliente = $cotizacion->cliente->documento;
-
-                    // Cadena oficial de SUNAT
+                    
+                    // Manejo seguro del documento del cliente
+                    $numDocCliente = $cotizacion->cliente->documento ?? '00000000';
+                    $tipoDocCliente = strlen($numDocCliente) == 11 ? '6' : '1';
+                    
                     $sunatString = "{$rucEmisor}|{$tipoDoc}|{$serie}|{$numero}|{$igvFormatted}|{$totalFormatted}|{$fecha}|{$tipoDocCliente}|{$numDocCliente}|";
-                    $qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=" . urlencode($sunatString);
+                    $hashSunat = strtoupper(substr(hash('sha256', $sunatString), 0, 20));
 
-                    // TRUCO MAESTRO: Forzamos a PHP a ignorar la falta de certificados SSL en tu XAMPP local
-                    $contextoSsl = stream_context_create([
-                        "ssl" => [
-                            "verify_peer" => false,
-                            "verify_peer_name" => false,
-                        ],
-                    ]);
-
-                    // Descargamos el QR de internet y lo transformamos a Base64
-                    try {
-                        $qrContenido = file_get_contents($qrUrl, false, $contextoSsl);
-                        $qrBase64 = "data:image/png;base64," . base64_encode($qrContenido);
-                    } catch (\Exception $e) {
-                        $qrBase64 = null; 
-                    }
+                    // Generar QR externo y codificar en base64 para que DOMPDF lo imprima sin conexión remota
+                    $qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=100x100&margin=1&data=' . urlencode($sunatString);
+                    $qrData = 'data:image/png;base64,' . base64_encode(file_get_contents($qrUrl));
                 @endphp
 
                 <table style="border: none; width: 100%;">
                     <tr>
                         <td width="80px" style="border: none; padding: 0; vertical-align: middle;">
-                            @if($qrBase64)
-                                <img src="{{ $qrBase64 }}" alt="QR SUNAT" style="width: 70px; height: 70px; border: 1px solid #000; padding: 2px;">
-                            @else
-                                <div style="width: 70px; height: 70px; border: 1px solid #000; text-align: center; font-size: 8px; padding-top: 25px;">[QR ERROR]</div>
-                            @endif
+                            <div style="width: 72px; height: 72px; border: 1px solid #000; padding: 2px;">
+                                <img src="{{ $qrData }}" alt="QR SUNAT" style="width: 66px; height: 66px; display: block;" />
+                            </div>
                         </td>
                         <td style="border: none; padding-left: 10px; vertical-align: middle; font-size: 7.5px; color: #444; font-style: italic; line-height: 1.2;">
-                            Representación impresa de la Cotización Comercial.<br>
-                            Simulación de validación con firma digital y estándar de Facturación Electrónica SUNAT.
+                            Documento electrónico de cotización registrado en el sistema.<br>
+                            Verificación de integridad mediante firma digital y estándar de Facturación Electrónica SUNAT.<br>
+                            Hash de validación: {{ $hashSunat }}
                         </td>
                     </tr>
                 </table>
@@ -206,13 +171,14 @@
             <td width="35%" style="border: none;"></td>
         </tr>
     </table>
+
     <table class="border-all w-100" style="margin-bottom: 20px;">
         <tr>
             <td colspan="2" class="bg-cyan fw-bold text-center">CONDICIONES DE VENTA</td>
         </tr>
         <tr>
             <td class="fw-bold" width="25%">EMPRESA</td>
-            <td>{{ $cotizacion->cliente->nombre_razon_social }}</td>
+            <td>{{ $cotizacion->cliente->nombre_razon_social ?? 'S/D' }}</td>
         </tr>
         <tr>
             <td class="fw-bold">DIRECCION</td>

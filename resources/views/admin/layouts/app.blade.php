@@ -10,7 +10,7 @@
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
     
     <style>
-        /* TRANSICIÓN FLUIDA: Efecto Fade-in */
+        /* TRANSICIÓN FLUIDA
         body { background-color: #f4f7f6; font-family: 'Segoe UI', sans-serif; overflow-x: hidden; opacity: 0; transition: opacity 0.25s ease-in-out; }
         body.page-loaded { opacity: 1; }
 

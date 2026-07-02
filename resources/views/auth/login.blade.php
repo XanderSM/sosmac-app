@@ -6,31 +6,29 @@
     <title>Acceso - SOSMAC</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        /* Fondo Animado */
+        /* Fondo con Imagen Real y Filtro Estético */
         body {
             margin: 0;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(-45deg, #0b1536, #11235A, #1E5DDB, #5bc0de);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
+            /* Aquí está la magia: Un gradiente azul oscuro semitransparente SOBRE tu imagen */
+            background: linear-gradient(rgba(11, 21, 54, 0.85), rgba(23, 29, 39, 0.5)), 
+                        url("{{ asset('img/bg-login.jpg') }}") no-repeat center center;
+            background-size: cover;
+            background-attachment: fixed;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             overflow: hidden;
         }
 
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        /* Tarjeta Principal con efecto 3D Hover */
+        /* Tarjeta Principal con efecto Cristal (Glassmorphism) y 3D Hover */
         .glass-card {
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(255, 255, 255, 0.85); /* Ligeramente más transparente */
+            backdrop-filter: blur(12px); /* Desenfoque de cristal real sobre la foto */
+            -webkit-backdrop-filter: blur(12px);
             border-radius: 20px;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(255, 255, 255, 0.3);
             overflow: hidden;
             width: 900px;
             max-width: 95%;
@@ -42,12 +40,12 @@
 
         .glass-card:hover {
             transform: perspective(1000px) rotateX(1deg) rotateY(1deg) translateY(-5px);
-            box-shadow: 0 35px 60px rgba(0, 0, 0, 0.6);
+            box-shadow: 0 35px 60px rgba(0, 0, 0, 0.7);
         }
 
-        /* Panel Izquierdo (Branding) */
+        /* Panel Izquierdo (Branding semitransparente) */
         .left-panel {
-            background: #11235A;
+            background: rgba(17, 35, 90, 0.85); /* Azul institucional con 85% de opacidad */
             color: white;
             padding: 50px;
             display: flex;
@@ -87,7 +85,7 @@
             100% { transform: translateY(0px) scale(1); }
         }
 
-        /* Logo Levitando (SIN FONDO BLANCO) */
+        /* Logo Levitando */
         .logo-container img {
             width: 180px;
             background: transparent;
@@ -113,7 +111,7 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
-            background: white;
+            background: rgba(255, 255, 255, 0.95);
         }
 
         /* Inputs Neumórficos */
@@ -182,7 +180,7 @@
                 @csrf
                 <div class="mb-4">
                     <label class="form-label fw-bold text-muted small" style="letter-spacing: 0.5px;">CORREO ELECTRÓNICO</label>
-                    <input type="email" class="form-control" name="email" placeholder="Ej: admin@sosmac.com" required autofocus>
+                    <input type="email" class="form-control" name="email" placeholder="" required autofocus>
                 </div>
                 <div class="mb-4">
                     <label class="form-label fw-bold text-muted small" style="letter-spacing: 0.5px;">CONTRASEÑA</label>
@@ -191,11 +189,7 @@
                 <button type="submit" class="btn btn-login w-100 mt-2">INGRESAR AL SISTEMA</button>
             </form>
             
-            <div class="mt-4 small text-muted text-center border-top pt-3">
-                <p class="mb-0"><strong>Credenciales de prueba:</strong><br>
-                Admin: admin@sosmac.com / admin123<br>
-                Técnico: tecnico@sosmac.com / tecnico123</p>
-            </div>
+           
         </div>
     </div>
 

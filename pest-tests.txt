@@ -1,0 +1,8 @@
+
+   INFO  Available tests:
+
+ - P\Tests\Unit\ExampleTest::__pest_evaluable_that_true_is_true
+ - P\Tests\Feature\CotizacionPdfTest::__pest_evaluable_it_solo_muestra_en_el_pdf_los_servicios_que_realmente_fueron_seleccionados
+ - P\Tests\Feature\CotizacionPdfTest::__pest_evaluable_it_renderiza_el_pdf_de_cotización_sin_depender_de_un_qr_externo
+ - P\Tests\Feature\ExampleTest::__pest_evaluable_the_application_returns_a_successful_response
+ - P\Tests\Feature\TecnicoInventoryTest::__pest_evaluable_it_descuenta_el_stock_del_inventario_cuando_un_tecnico_completa_una_orden_con_un_producto.
