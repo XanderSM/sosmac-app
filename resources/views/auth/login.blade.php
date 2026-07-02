@@ -19,7 +19,7 @@
             background-size: cover;
             background-attachment: fixed;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow: hidden;
+            overflow-y: auto;
         }
 
         /* Tarjeta Principal con efecto Cristal (Glassmorphism) y 3D Hover */
@@ -153,6 +153,67 @@
         .btn-login:active {
             transform: translateY(1px);
             box-shadow: 0 5px 10px rgba(30, 93, 219, 0.3);
+        }
+
+        /* Media Queries para Tablet y Móvil */
+        @media (max-width: 768px) {
+            body {
+                padding: 20px 10px;
+                align-items: flex-start; /* Permite mejor scroll en pantallas pequeñas */
+            }
+
+            .glass-card {
+                flex-direction: column;
+                margin-top: 10px;
+                margin-bottom: 10px;
+                transform: none !important; /* Desactiva 3D hover en móvil para evitar tirones */
+            }
+
+            .glass-card:hover {
+                transform: none !important;
+                box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
+            }
+
+            .left-panel {
+                padding: 40px 20px;
+                min-width: 100%;
+            }
+
+            .logo-container img {
+                width: 130px;
+                margin-bottom: 15px;
+            }
+
+            .right-panel {
+                padding: 40px 30px;
+                min-width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px 5px;
+            }
+
+            .left-panel {
+                padding: 30px 15px;
+            }
+
+            .logo-container img {
+                width: 110px;
+            }
+
+            .right-panel {
+                padding: 30px 20px;
+            }
+
+            .form-control {
+                padding: 12px 15px;
+            }
+
+            .btn-login {
+                padding: 12px;
+            }
         }
     </style>
 </head>
